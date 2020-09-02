@@ -1,8 +1,8 @@
 import React, { useRef, useCallback } from 'react';
 import {
+  Image,
   View,
   ScrollView,
-  Image,
   KeyboardAvoidingView,
   Platform,
   TextInput,
@@ -14,21 +14,16 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 
-import logoImg from '../../assets/logo.png';
+import api from '../../services/api';
+
+import getValidationErrors from '../../utils/getValidationErrors';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-import getValidationErrors from '../../utils/getValidationErrors';
+import logoImg from '../../assets/logo.png';
 
-import api from '../../services/api';
-
-import {
-  Container,
-  Title,
-  BackToSignInButton,
-  BackToSignInButtonText,
-} from './styles';
+import { Container, Title, BackToSignIn, BackToSignInText } from './styles';
 
 interface SignUpFormData {
   name: string;
@@ -37,9 +32,8 @@ interface SignUpFormData {
 }
 
 const SignUp: React.FC = () => {
-  const navigation = useNavigation();
-
   const formRef = useRef<FormHandles>(null);
+  const navigation = useNavigation();
 
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
@@ -52,8 +46,8 @@ const SignUp: React.FC = () => {
         const schema = Yup.object().shape({
           name: Yup.string().required('Nome obrigatório'),
           email: Yup.string()
-            .required('Email obrigatório')
-            .email('Digite um email válido'),
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
           password: Yup.string().min(6, 'No mínimo 6 dígitos'),
         });
 
@@ -64,17 +58,20 @@ const SignUp: React.FC = () => {
         await api.post('/users', data);
 
         Alert.alert(
-          'Cadastro realizado com sucesso',
-          'Você já pode fazer login no GoBarber',
+          'Cadastro realizado com sucesso!',
+          'Você já pode fazer login na aplicação.',
         );
 
-        navigation.navigate('SignIn');
+        navigation.goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
-          const error = getValidationErrors(err);
-          formRef.current?.setErrors(error);
+          const errors = getValidationErrors(err);
+
+          formRef.current?.setErrors(errors);
+
           return;
         }
+
         Alert.alert(
           'Erro no cadastro',
           'Ocorreu um erro ao fazer cadastro, tente novamente.',
@@ -97,6 +94,7 @@ const SignUp: React.FC = () => {
         >
           <Container>
             <Image source={logoImg} />
+
             <View>
               <Title>Crie sua conta</Title>
             </View>
@@ -115,9 +113,9 @@ const SignUp: React.FC = () => {
 
               <Input
                 ref={emailInputRef}
+                keyboardType="email-address"
                 autoCorrect={false}
                 autoCapitalize="none"
-                keyboardType="email-address"
                 name="email"
                 icon="mail"
                 placeholder="E-mail"
@@ -129,32 +127,27 @@ const SignUp: React.FC = () => {
 
               <Input
                 ref={passwordInputRef}
+                secureTextEntry
                 name="password"
                 icon="lock"
                 placeholder="Senha"
-                secureTextEntry
-                returnKeyType="send"
                 textContentType="newPassword"
-                onSubmitEditing={() => {
-                  formRef.current?.submitForm();
-                }}
+                returnKeyType="send"
+                onSubmitEditing={() => formRef.current?.submitForm()}
               />
 
-              <Button
-                onPress={() => {
-                  formRef.current?.submitForm();
-                }}
-              >
-                Criar Conta
+              <Button onPress={() => formRef.current?.submitForm()}>
+                Entrar
               </Button>
             </Form>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
-      <BackToSignInButton onPress={() => navigation.goBack()}>
+
+      <BackToSignIn onPress={() => navigation.goBack()}>
         <Icon name="arrow-left" size={20} color="#fff" />
-        <BackToSignInButtonText>Voltar para Logon</BackToSignInButtonText>
-      </BackToSignInButton>
+        <BackToSignInText>Voltar para logon</BackToSignInText>
+      </BackToSignIn>
     </>
   );
 };
