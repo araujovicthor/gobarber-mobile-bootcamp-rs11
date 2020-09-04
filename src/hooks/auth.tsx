@@ -6,13 +6,12 @@ import React, {
   useEffect,
 } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
-
 import api from '../services/api';
 
 interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   avatar_url: string;
 }
 
@@ -40,25 +39,29 @@ const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStorageData(): Promise<void> {
+    async function loadStoragedData(): Promise<void> {
       const [token, user] = await AsyncStorage.multiGet([
         '@GoBarber:token',
         '@GoBarber:user',
       ]);
 
       if (token[1] && user[1]) {
-        api.defaults.headers.authorization = `Bearer ${token}`;
+        api.defaults.headers.authorization = `Bearer ${token[1]}`;
 
         setData({ token: token[1], user: JSON.parse(user[1]) });
       }
 
       setLoading(false);
     }
-    loadStorageData();
+
+    loadStoragedData();
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const response = await api.post('/sessions', { email, password });
+    const response = await api.post('sessions', {
+      email,
+      password,
+    });
 
     const { token, user } = response.data;
 
@@ -67,13 +70,13 @@ const AuthProvider: React.FC = ({ children }) => {
       ['@GoBarber:user', JSON.stringify(user)],
     ]);
 
-    api.defaults.headers.authorization = `Bearer ${token}`;
+    api.defaults.headers.authorization = `Bearer ${token[1]}`;
 
     setData({ token, user });
   }, []);
 
   const signOut = useCallback(async () => {
-    await AsyncStorage.multiRemove(['@GoBarber:token', '@GoBarber:user']);
+    await AsyncStorage.multiRemove(['@GoBarber:user', '@GoBarber:token']);
 
     setData({} as AuthState);
   }, []);
@@ -89,7 +92,7 @@ function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(' useAuth must be use in AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
 
   return context;
