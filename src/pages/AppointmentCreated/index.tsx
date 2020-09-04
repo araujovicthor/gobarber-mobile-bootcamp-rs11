@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { StatusBar } from 'react-native';
 import {
   Container,
   Title,
@@ -45,6 +46,12 @@ const AppointmentCreated: React.FC = () => {
 
   return (
     <Container>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#312e38"
+        translucent
+      />
+
       <Icon name="check" size={80} color="#04d361" />
 
       <Title>Agendamento Concluído</Title>

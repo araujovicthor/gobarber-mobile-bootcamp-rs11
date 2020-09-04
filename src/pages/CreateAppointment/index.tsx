@@ -153,7 +153,11 @@ const CreateAppointment: React.FC = () => {
 
   return (
     <Container>
-      <StatusBar barStyle="light-content" backgroundColor="#28262e" />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#28262e"
+        translucent
+      />
       <Header>
         <BackButton onPress={navigateBack}>
           <Icon name="chevron-left" size={24} color="#999591" />

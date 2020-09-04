@@ -55,7 +55,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container>
-      <StatusBar barStyle="light-content" backgroundColor="#28262e" />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#28262e"
+        translucent
+      />
       <Header>
         <HeaderTitle>
           Bem vindo,
